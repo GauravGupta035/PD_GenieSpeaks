@@ -4,7 +4,8 @@ on:
   pull_request:
     branches:
       - master
-      - integration
+      - dev
+      - test
   workflow_dispatch:
 
 jobs:
