@@ -101,7 +101,8 @@ class FlipkartSpider(scrapy.Spider):
         review = {
             'title': '',
             'description': '',
-            'review_star': '',
+            'stars': 1,
+            'url': '',
             'images': [],
             'product': '',
             'user': 'Flipkart Reviewer',
@@ -127,7 +128,7 @@ class FlipkartSpider(scrapy.Spider):
             for row in tables:
                 key = row.xpath('td[1]//text()').extract_first()
                 value = row.xpath('td[2]//ul//li//text()').extract_first()
-                if key in ['Model Number', 'Part Number', 'Model Name', 'Series']:
+                if key.lower() in ['model number', 'part number', 'model name', 'series']:
                     identifiers[key] = value
                 else:
                     attributes[key] = value
@@ -147,7 +148,7 @@ class FlipkartSpider(scrapy.Spider):
             'scrapped_times': 1,
             'init_price': self.parse_product_init_price(response=response),
             'curr_price': self.parse_product_curr_price(response=response),
-            'identifiers': [],
+            'identifiers': {},
             'product_url': product_url
         }
 
