@@ -137,7 +137,9 @@ class GeniescrapesPipeline:
                 {
                     '$push': {
                         'ecommerce': ecommerce_detail,
-                        'reviews': new_review_id_list
+                        'reviews': {
+                            '$each': new_review_id_list
+                        }
                     },
                 }
             )
@@ -215,7 +217,8 @@ class GeniescrapesPipeline:
             'scrapped_times': item['ecommerce']['scrapped_times'],
             'init_price': item['ecommerce']['init_price'],
             'curr_price': item['ecommerce']['curr_price'],
-            'identifiers': item['ecommerce']['identifiers']
+            'identifiers': item['ecommerce']['identifiers'],
+            'product_url': item['ecommerce']['product_url'],
         }
 
         if similar_finds:

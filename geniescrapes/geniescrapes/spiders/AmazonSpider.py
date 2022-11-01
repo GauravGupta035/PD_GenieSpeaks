@@ -101,7 +101,7 @@ class AmazonSpider(scrapy.Spider):
                 response.xpath(
                     '//span[@data-hook="review-date"]/text()').extract()
             ):
-                review_url = f"https://www.amazon.in/gp/customer-reviews/${review_id}"
+                review_url = f"https://www.amazon.in/gp/customer-reviews/{review_id}"
                 stars = int(review_star[0])
                 reviews.append({
                     'title': review_title,

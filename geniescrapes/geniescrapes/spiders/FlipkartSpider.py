@@ -101,7 +101,7 @@ class FlipkartSpider(scrapy.Spider):
         review = {
             'title': '',
             'description': '',
-            'stars': 1,
+            'stars': 0,
             'url': '',
             'images': [],
             'product': '',
