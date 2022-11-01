@@ -126,6 +126,27 @@ class GeniescrapesPipeline:
             print("Failed to create the product", error)
             return None
 
+    def update_product(self, product_to_update, new_prod_detail, ecommerce_detail, new_review_id_list):
+        '''updates product details to existing product and
+        stores it in database and returns the productID'''
+        try:
+            updated_prod = self.product.find_one_and_update(
+                {
+                    '_id': product_to_update
+                },
+                {
+                    '$push': {
+                        'ecommerce': ecommerce_detail,
+                        'reviews': new_review_id_list
+                    },
+                }
+            )
+
+            return product_to_update
+        except Exception as error:
+            print("Failed to create the product", error)
+            return None
+
     def getOrganizationID(self, name):
         try:
             org_data = self.organization.find_one({"name": name})
@@ -158,6 +179,13 @@ class GeniescrapesPipeline:
 
     def process_item(self, item, spider):
         '''pipeline to store data into mongodb'''
+        similar_finds = ""
+        for tag in item["tags"]:
+            similar_finds = self.product.find_one(
+                {"tags": {"$in": [tag]}})
+            if similar_finds:
+                similar_finds = similar_finds['_id']
+                break
 
         org_id = self.getOrganizationID(name=item['organization'])
         ecom_id = self.getECommerceID(
@@ -190,21 +218,29 @@ class GeniescrapesPipeline:
             'identifiers': item['ecommerce']['identifiers']
         }
 
-        new_prod_id = self.create_product(
-            product=item,
-            organization=org_id,
-            ecommerce=[ecommerce],
-            review_id_list=review_ids
-        )
+        if similar_finds:
+            prod_id = self.update_product(
+                product_to_update=similar_finds,
+                new_prod_detail=item,
+                ecommerce_detail=ecommerce,
+                new_review_id_list=review_ids)
+        else:
+            prod_id = self.create_product(
+                product=item,
+                organization=org_id,
+                ecommerce=[ecommerce],
+                review_id_list=review_ids
+            )
 
-        self.ecommerce.update_one(
-            {"_id": ecom_id}, {"$push": {"products_scrapped": new_prod_id}}
-        )
-        self.organization.update_one(
-            {"_id": org_id}, {"$push": {"products": new_prod_id}}
-        )
+            self.ecommerce.update_one(
+                {"_id": ecom_id}, {"$push": {"products_scrapped": prod_id}}
+            )
+            self.organization.update_one(
+                {"_id": org_id}, {"$push": {"products": prod_id}}
+            )
+
         for review_id in review_ids:
             self.review.update_one(
-                {"_id": review_id}, {"$set": {"product": new_prod_id}}
+                {"_id": review_id}, {"$set": {"product": prod_id}}
             )
         return item

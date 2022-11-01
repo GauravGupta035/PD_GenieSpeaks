@@ -158,6 +158,11 @@ class FlipkartSpider(scrapy.Spider):
         (attributes,
          identifiers) = self.parse_product_attributes_identifiers(response=response)
 
+        tags = list(set(identifiers.values()))
+
+        if not organization:
+            return
+
         self.logger.info(
             f"{curr_prod_no}\t\t{self.total_scraped_items+1}\t\t{page}\t\t{data_id}")
         yield {
@@ -167,6 +172,7 @@ class FlipkartSpider(scrapy.Spider):
             'ecommerce': ecommerce,
             'reviews': reviews,
             'attributes': attributes,
-            'identifiers': identifiers
+            'identifiers': identifiers,
+            'tags': tags
         }
         self.total_scraped_items += 1
