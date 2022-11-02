@@ -14,7 +14,7 @@ RUN npm install
 COPY /server /usr/src/app
 
 # Expose port locally to docker container
-EXPOSE 5000
+EXPOSE 80
 
 # Start API Server
 CMD ["npm", "run", "server"]
