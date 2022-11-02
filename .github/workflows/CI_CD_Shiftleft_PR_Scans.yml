@@ -10,6 +10,7 @@ on:
 
 jobs:
   paths-filter:
+    name: Trigger Folder Tests
     runs-on: ubuntu-latest
     outputs:
       geniescrapes: ${{ steps.filter.outputs.geniescrapes }}
