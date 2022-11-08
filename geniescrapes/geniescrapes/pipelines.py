@@ -7,6 +7,8 @@
 # useful for handling different item types with a single interface
 '''Pipeline to feed data into MongoDB'''
 import os
+from datetime import datetime
+
 import pymongo
 
 
@@ -98,6 +100,7 @@ class GeniescrapesPipeline:
             new_user['hashedpassword'] = ''
             new_user['reviews'] = []
             new_user['bookmarks'] = []
+            new_user['created_on'] = datetime.today()
 
             saved_user = self.user.insert_one(new_user)
             return saved_user.inserted_id
@@ -115,6 +118,7 @@ class GeniescrapesPipeline:
             new_prod['attributes'] = product['attributes']
             new_prod['identifiers'] = product['identifiers']
             new_prod['tags'] = product['tags']
+            new_prod['satisfactory_rating'] = 0
 
             new_prod['organization'] = organization
             new_prod['ecommerce'] = ecommerce
@@ -182,12 +186,26 @@ class GeniescrapesPipeline:
     def process_item(self, item, spider):
         '''pipeline to store data into mongodb'''
         similar_finds = ""
-        for tag in item["tags"]:
+        for key, value in item["identifiers"].items():
+            if key.lower() not in ['item model number',
+                                   'model number',
+                                   'part number']:
+                continue
             similar_finds = self.product.find_one(
-                {"tags": {"$in": [tag]}})
+                {"tags": {"$in": [value]}})
             if similar_finds:
                 similar_finds = similar_finds['_id']
+                print(similar_finds)
                 break
+        # for tag in item["tags"]:
+        #     if tag.lower() not in ['item model number', 'model number']:
+        #         continue
+        #     similar_finds = self.product.find_one(
+        #         {"tags": {"$in": [tag]}})
+        #     if similar_finds:
+        #         similar_finds = similar_finds['_id']
+        #         print(similar_finds)
+        #         break
 
         org_id = self.getOrganizationID(name=item['organization'])
         ecom_id = self.getECommerceID(

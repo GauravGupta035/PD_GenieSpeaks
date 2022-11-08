@@ -1,6 +1,8 @@
 import re
 import time
+from datetime import datetime
 from urllib.parse import urlencode
+
 import scrapy
 
 
@@ -103,6 +105,10 @@ class AmazonSpider(scrapy.Spider):
             ):
                 review_url = f"https://www.amazon.in/gp/customer-reviews/{review_id}"
                 stars = int(review_star[0])
+                try:
+                    review_data = datetime.strptime(" ".join(date.split()[-3:]), '%d %B %Y')
+                except Exception:
+                    review_data = datetime.today()
                 reviews.append({
                     'title': review_title,
                     'description': description,
@@ -112,8 +118,8 @@ class AmazonSpider(scrapy.Spider):
                     'product': '',
                     'user': 'Amazon Reviewer',
                     'ecommerce': 'Amazon',
-                    'reviewed_on': date,
-                    'scrapped_on': int(time.time())*1000,
+                    'reviewed_on': review_data,
+                    'scrapped_on': datetime.today(),
                     'verified': False
                 })
 
@@ -153,7 +159,7 @@ class AmazonSpider(scrapy.Spider):
         ecommerce = {
             'ecommerceSite': 'Amazon',
             'rating': 0,
-            'last_scrapped': int(time.time())*1000,
+            'last_scrapped': datetime.today(),
             'scrapped_times': 1,
             'init_price': 0,
             'curr_price': self.parse_product_curr_price(response=response),

@@ -1,5 +1,7 @@
 import time
+from datetime import datetime
 from urllib.parse import urlencode
+
 import scrapy
 
 
@@ -108,7 +110,7 @@ class FlipkartSpider(scrapy.Spider):
             'user': 'Flipkart Reviewer',
             'ecommerce': 'Flipkart',
             'reviewed_on': '',
-            'scrapped_on': int(time.time())*1000,
+            'scrapped_on': datetime.today(),
             'verified': False
         }
         reviews = []
@@ -144,7 +146,7 @@ class FlipkartSpider(scrapy.Spider):
         ecommerce = {
             'ecommerceSite': 'Flipkart',
             'rating': 0,
-            'last_scrapped': int(time.time())*1000,
+            'last_scrapped': datetime.today(),
             'scrapped_times': 1,
             'init_price': self.parse_product_init_price(response=response),
             'curr_price': self.parse_product_curr_price(response=response),
