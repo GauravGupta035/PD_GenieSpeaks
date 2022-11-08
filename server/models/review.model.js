@@ -22,11 +22,11 @@ const ReviewSchema = new mongoose.Schema({
     default: []
   },
   scrapped_on: {
-    type: Number,
+    type: Date,
     default: Date.now()
   },
   reviewed_on: {
-    type: String,
+    type: Date,
     default: Date.now()
   },
   verified: {

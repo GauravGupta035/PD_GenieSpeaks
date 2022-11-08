@@ -21,6 +21,10 @@ const ProductSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  satisfactory_rating: {
+    type: Number,
+    default: 0
+  },
   organization: {
     type: mongoose.Types.ObjectId,
     ref: 'Organization',
