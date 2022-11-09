@@ -1,4 +1,3 @@
-# Have a multi-step image building process.
 # Build the image off node version 16, and alias image as build-app.
 FROM node:16-alpine as build-app
 
