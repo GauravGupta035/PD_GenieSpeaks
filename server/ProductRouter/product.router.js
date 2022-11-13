@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
     }
     //Me bad
     //Dont Say
+          // '_id': mongoose.Types.ObjectId(prodID)
     const productData = await Product.aggregate([
       {
         '$match': {
@@ -25,7 +26,9 @@ router.get('/', async (req, res) => {
             '$cond': [
               {
                 '$eq': [
-                  '$review_count', 0
+                  {
+                    '$size': '$reviews'
+                  }, 0
                 ]
               }, '--', {
                 '$multiply': [
@@ -47,34 +50,35 @@ router.get('/', async (req, res) => {
         }
       }, {
         '$lookup': {
-          'from': 'Organization', 
-          'localField': 'organization', 
-          'foreignField': '_id', 
+          'from': 'Organization',
+          'localField': 'organization',
+          'foreignField': '_id',
           'as': 'organization'
         }
       }, {
         '$lookup': {
-          'from': 'Review', 
-          'localField': 'reviews', 
-          'foreignField': '_id', 
+          'from': 'Review',
+          'localField': 'reviews',
+          'foreignField': '_id',
           'as': 'reviews'
         }
       }, {
         '$unwind': {
-          'path': '$reviews'
+          'path': '$reviews',
+          'preserveNullAndEmptyArrays': true
         }
       }, {
         '$lookup': {
-          'from': 'User', 
-          'localField': 'reviews.user', 
-          'foreignField': '_id', 
+          'from': 'User',
+          'localField': 'reviews.user',
+          'foreignField': '_id',
           'as': 'reviews.user'
         }
       }, {
         '$lookup': {
-          'from': 'ECommerce', 
-          'localField': 'reviews.ecommerce', 
-          'foreignField': '_id', 
+          'from': 'ECommerce',
+          'localField': 'reviews.ecommerce',
+          'foreignField': '_id',
           'as': 'reviews.ecommerce'
         }
       }, {
@@ -83,7 +87,7 @@ router.get('/', async (req, res) => {
             '$arrayElemAt': [
               '$reviews.user', 0
             ]
-          }, 
+          },
           'reviews.ecommerce': {
             '$arrayElemAt': [
               '$reviews.ecommerce', 0
@@ -92,53 +96,54 @@ router.get('/', async (req, res) => {
         }
       }, {
         '$group': {
-          '_id': '$_id', 
+          '_id': '$_id',
           'title': {
             '$first': '$title'
-          }, 
+          },
           'images': {
             '$first': '$images'
-          }, 
+          },
           'attributes': {
             '$first': '$attributes'
-          }, 
+          },
           'identifiers': {
             '$first': '$identifiers'
-          }, 
+          },
           'satisfactory_rating': {
             '$first': '$satisfactory_rating'
-          }, 
+          },
           'organization': {
             '$first': '$organization'
-          }, 
+          },
           'ecommerce': {
             '$first': '$ecommerce'
-          }, 
+          },
           'reviews': {
             '$push': {
-              '_id': '$reviews._id', 
-              'title': '$reviews.title', 
-              'description': '$reviews.description', 
-              'stars': '$reviews.stars', 
-              'url': '$reviews.url', 
-              'images': '$reviews.images', 
-              'scrapped_on': '$reviews.scrapped_on', 
-              'reviewed_on': '$reviews.reviewed_on', 
-              'verified': '$reviews.verified', 
-              'user': '$reviews.user', 
+              '_id': '$reviews._id',
+              'title': '$reviews.title',
+              'description': '$reviews.description',
+              'stars': '$reviews.stars',
+              'url': '$reviews.url',
+              'images': '$reviews.images',
+              'scrapped_on': '$reviews.scrapped_on',
+              'reviewed_on': '$reviews.reviewed_on',
+              'verified': '$reviews.verified',
+              'user': '$reviews.user',
               'ecommerce': '$reviews.ecommerce'
             }
           }
         }
       }, {
         '$unwind': {
-          'path': '$ecommerce'
+          'path': '$ecommerce',
+          'preserveNullAndEmptyArrays': true
         }
       }, {
         '$lookup': {
-          'from': 'ECommerce', 
-          'localField': 'ecommerce.ecommerceID', 
-          'foreignField': '_id', 
+          'from': 'ECommerce',
+          'localField': 'ecommerce.ecommerceID',
+          'foreignField': '_id',
           'as': 'ecommerce.info'
         }
       }, {
@@ -147,7 +152,7 @@ router.get('/', async (req, res) => {
             '$arrayElemAt': [
               '$organization', 0
             ]
-          }, 
+          },
           'ecommerce.info': {
             '$arrayElemAt': [
               '$ecommerce.info', 0
@@ -160,71 +165,68 @@ router.get('/', async (req, res) => {
         }
       }, {
         '$group': {
-          '_id': '$_id', 
+          '_id': '$_id',
           'title': {
             '$first': '$title'
-          }, 
+          },
           'images': {
             '$first': '$images'
-          }, 
+          },
           'attributes': {
             '$first': '$attributes'
-          }, 
+          },
           'identifiers': {
             '$first': '$identifiers'
-          }, 
+          },
           'satisfactory_rating': {
             '$first': '$satisfactory_rating'
-          }, 
+          },
           'organization': {
             '$first': '$organization'
-          }, 
+          },
           'reviews': {
             '$first': '$reviews'
-          }, 
+          },
           'ecommerce': {
             '$push': {
-              '_id': '$ecommerce.ecommerceID', 
-              'name': '$ecommerce.info.name', 
-              'init_price': '$ecommerce.init_price', 
-              'curr_price': '$ecommerce.curr_price', 
-              'product_url': '$ecommerce.product_url', 
+              '_id': '$ecommerce.ecommerceID',
+              'name': '$ecommerce.info.name',
+              'init_price': '$ecommerce.init_price',
+              'curr_price': '$ecommerce.curr_price',
+              'product_url': '$ecommerce.product_url',
               'last_scrapped': '$ecommerce.last_scrapped'
             }
           }
         }
       }, {
         '$project': {
-          'organization.products': 0, 
-          'reviews.product': 0, 
-          'reviews.user.email': 0, 
-          'reviews.user.hashedpassword': 0, 
-          'reviews.user.reviews': 0, 
-          'reviews.user.bookmarks': 0, 
-          'reviews.user.created_on': 0, 
-          'reviews.ecommerce.product_url': 0, 
-          'reviews.ecommerce.search_url': 0, 
-          'reviews.ecommerce.products_scrapped': 0, 
+          'organization.products': 0,
+          'reviews.product': 0,
+          'reviews.user.email': 0,
+          'reviews.user.hashedpassword': 0,
+          'reviews.user.reviews': 0,
+          'reviews.user.bookmarks': 0,
+          'reviews.user.created_on': 0,
+          'reviews.ecommerce.product_url': 0,
+          'reviews.ecommerce.search_url': 0,
+          'reviews.ecommerce.products_scrapped': 0,
           'reviews.ecommerce.past_scrapes': 0
+        }
+      }, {
+        '$addFields': {
+          'reviews': {
+            '$filter': {
+              'input': '$reviews', 
+              'cond': {
+                '$ifNull': [
+                  '$$this._id', undefined
+                ]
+              }
+            }
+          }
         }
       }
     ])
-    // .populate({
-    //     path: 'organization',
-    //     select: 'name'
-    //   })
-    //   .populate({
-    //     path: 'ecommerce.ecommerceID',
-    //     model: ECommerce,
-    //     select: 'name'
-    //   })
-    //   .populate({
-    //     path: 'reviews',
-    //     populate: {
-    //       path: 'user ecommerce',
-    //       select: 'name'
-    //     }
-    //   })
     res.status(200).json({ productData: productData[0] })
   } catch (e) {
     console.error(e)

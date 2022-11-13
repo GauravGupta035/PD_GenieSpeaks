@@ -69,7 +69,9 @@ class FlipkartSpider(scrapy.Spider):
         '''parse_product_image_list'''
         images = []
         try:
-            pass
+            img = response.xpath(
+                '//*[@class="CXW8mj _3nMexc"]/img/@src').extract_first()
+            images.append(img)
         except Exception as error:
             self.logger.warning(
                 f"{self.total_scraped_items+1}: Couldnt fetch images || {str(error)}")
