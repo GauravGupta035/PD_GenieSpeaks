@@ -41,7 +41,6 @@ const ProductDetail = (props) => {
 			setIsLoading(false);
 		});
 
-		// console.log(productInfo);
 	};
 
 	useEffect(getProductInfo, [id]);
@@ -52,11 +51,12 @@ const ProductDetail = (props) => {
 				<NavBar
 					searchQuery={props.searchQuery}
 					setSearchQuery={props.setSearchQuery}
+					setFilter={props.setFilter}
 				/>
 
-				<Loader hidden={isLoading} />
-				<Loader hidden={isLoading} />
-				<Loader hidden={isLoading} />
+				<Loader hidden={! isLoading} />
+				<Loader hidden={! isLoading} />
+				<Loader hidden={! isLoading} />
 			</div>
 		);
 	} else {
@@ -65,6 +65,7 @@ const ProductDetail = (props) => {
 				<NavBar
 					searchQuery={props.searchQuery}
 					setSearchQuery={props.setSearchQuery}
+					setFilter={props.setFilter}
 				/>
 
 				<SimpleGrid
@@ -123,7 +124,7 @@ const ProductDetail = (props) => {
 								colSpan={{ base: 1, xl: 1, lg: 2, md: 2, sm: 1 }}
 								mb={5}
 							>
-								<AvailableMenu productData={productInfo} />
+								<AvailableMenu ecommerce={productInfo.ecommerce} />
 							</GridItem>
 						</Show>
 
@@ -156,10 +157,10 @@ const ProductDetail = (props) => {
 										{
 											Object.keys(productInfo.identifiers).map((identifier, index) => {
 												return <>
-													<GridItem>
+													<GridItem key={identifier}>
 														<Text color='gray'>{identifier}</Text>
 													</GridItem>
-													<GridItem>
+													<GridItem key={index}>
 														<Text fontWeight='semibold'>{productInfo.identifiers[identifier]}</Text>
 													</GridItem>
 												</>
@@ -169,10 +170,10 @@ const ProductDetail = (props) => {
 										{
 											Object.keys(productInfo.attributes).map((attribute, index) => {
 												return <>
-													<GridItem>
+													<GridItem key={attribute}>
 														<Text color='gray'>{attribute}</Text>
 													</GridItem>
-													<GridItem>
+													<GridItem key={index*-1}>
 														<Text fontWeight='semibold'>{productInfo.attributes[attribute]}</Text>
 													</GridItem>
 												</>
@@ -209,7 +210,7 @@ const ProductDetail = (props) => {
 
 					<Show above='xl'>
 						<GridItem colSpan={{ base: 1, xl: 1, lg: 2, md: 2, sm: 1 }}>
-							<AvailableMenu productData={productInfo} />
+							<AvailableMenu ecommerce={productInfo.ecommerce} />
 						</GridItem>
 					</Show>
 				</SimpleGrid>

@@ -155,6 +155,10 @@ router.get('/', async (req, res) => {
           }
         }
       }, {
+        '$sort': {
+          'ecommerce.curr_price': 1
+        }
+      }, {
         '$group': {
           '_id': '$_id', 
           'title': {
