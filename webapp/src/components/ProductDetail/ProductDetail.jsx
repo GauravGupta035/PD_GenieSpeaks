@@ -153,44 +153,31 @@ const ProductDetail = (props) => {
 											sm: "0px",
 										}}
 									>
-										{/* {productInfo.identifiers.map((iden, index) => {
-											return (
-												<>
+										{
+											Object.keys(productInfo.identifiers).map((identifier, index) => {
+												return <>
 													<GridItem>
-														<Text>{iden[0]}</Text>
+														<Text color='gray'>{identifier}</Text>
 													</GridItem>
 													<GridItem>
-														<Text>{iden[1]}</Text>
+														<Text fontWeight='semibold'>{productInfo.identifiers[identifier]}</Text>
 													</GridItem>
 												</>
-											);
-										})} */}
-										<GridItem>
-											<Text color='gray'>Brand</Text>
-										</GridItem>
-										<GridItem>
-											<Text fontWeight='semibold'>
-												{productInfo.identifiers["Brand"]}
-											</Text>
-										</GridItem>
+											})
+										}
 
-										<GridItem>
-											<Text color='gray'>Series</Text>
-										</GridItem>
-										<GridItem>
-											<Text fontWeight='semibold' textTransform='uppercase'>
-												{productInfo.identifiers["Series"]}
-											</Text>
-										</GridItem>
-
-										<GridItem>
-											<Text color='gray'>Item Model Number</Text>
-										</GridItem>
-										<GridItem>
-											<Text fontWeight='semibold' textTransform='uppercase'>
-												{productInfo.identifiers["Item model number"]}
-											</Text>
-										</GridItem>
+										{
+											Object.keys(productInfo.attributes).map((attribute, index) => {
+												return <>
+													<GridItem>
+														<Text color='gray'>{attribute}</Text>
+													</GridItem>
+													<GridItem>
+														<Text fontWeight='semibold'>{productInfo.attributes[attribute]}</Text>
+													</GridItem>
+												</>
+											})
+										}
 									</Grid>
 								</TabPanel>
 								<TabPanel>
@@ -207,6 +194,7 @@ const ProductDetail = (props) => {
 														stars={review.stars}
 														reviewURL={review.url}
 														desc={review.description}
+														user={review.user}
 														ecommerce={review.ecommerce.name}
 														upVote='18'
 													/>

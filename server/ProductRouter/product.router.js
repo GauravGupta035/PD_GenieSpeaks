@@ -12,24 +12,216 @@ router.get('/', async (req, res) => {
     if (!prodID) {
       return res.status(400).json({ message: 'Requires Product ID' })
     }
-    const productData = await Product.findById(prodID)
-      .populate({
-        path: 'organization',
-        select: 'name'
-      })
-      .populate({
-        path: 'ecommerce.ecommerceID',
-        model: ECommerce,
-        select: 'name'
-      })
-      .populate({
-        path: 'reviews',
-        populate: {
-          path: 'user ecommerce',
-          select: 'name'
+    //Me bad
+    //Dont Say
+    const productData = await Product.aggregate([
+      {
+        '$match': {
+          '_id': mongoose.Types.ObjectId(prodID)
         }
-      })
-    res.status(200).json({ productData })
+      }, {
+        '$addFields': {
+          'satisfactory_rating': {
+            '$cond': [
+              {
+                '$eq': [
+                  '$review_count', 0
+                ]
+              }, '--', {
+                '$multiply': [
+                  {
+                    '$divide': [
+                      '$rating_sum', {
+                        '$multiply': [
+                          {
+                            '$size': '$reviews'
+                          }, 5
+                        ]
+                      }
+                    ]
+                  }, 100
+                ]
+              }
+            ]
+          }
+        }
+      }, {
+        '$lookup': {
+          'from': 'Organization', 
+          'localField': 'organization', 
+          'foreignField': '_id', 
+          'as': 'organization'
+        }
+      }, {
+        '$lookup': {
+          'from': 'Review', 
+          'localField': 'reviews', 
+          'foreignField': '_id', 
+          'as': 'reviews'
+        }
+      }, {
+        '$unwind': {
+          'path': '$reviews'
+        }
+      }, {
+        '$lookup': {
+          'from': 'User', 
+          'localField': 'reviews.user', 
+          'foreignField': '_id', 
+          'as': 'reviews.user'
+        }
+      }, {
+        '$lookup': {
+          'from': 'ECommerce', 
+          'localField': 'reviews.ecommerce', 
+          'foreignField': '_id', 
+          'as': 'reviews.ecommerce'
+        }
+      }, {
+        '$set': {
+          'reviews.user': {
+            '$arrayElemAt': [
+              '$reviews.user', 0
+            ]
+          }, 
+          'reviews.ecommerce': {
+            '$arrayElemAt': [
+              '$reviews.ecommerce', 0
+            ]
+          }
+        }
+      }, {
+        '$group': {
+          '_id': '$_id', 
+          'title': {
+            '$first': '$title'
+          }, 
+          'images': {
+            '$first': '$images'
+          }, 
+          'attributes': {
+            '$first': '$attributes'
+          }, 
+          'identifiers': {
+            '$first': '$identifiers'
+          }, 
+          'satisfactory_rating': {
+            '$first': '$satisfactory_rating'
+          }, 
+          'organization': {
+            '$first': '$organization'
+          }, 
+          'ecommerce': {
+            '$first': '$ecommerce'
+          }, 
+          'reviews': {
+            '$push': {
+              '_id': '$reviews._id', 
+              'title': '$reviews.title', 
+              'description': '$reviews.description', 
+              'stars': '$reviews.stars', 
+              'url': '$reviews.url', 
+              'images': '$reviews.images', 
+              'scrapped_on': '$reviews.scrapped_on', 
+              'reviewed_on': '$reviews.reviewed_on', 
+              'verified': '$reviews.verified', 
+              'user': '$reviews.user', 
+              'ecommerce': '$reviews.ecommerce'
+            }
+          }
+        }
+      }, {
+        '$unwind': {
+          'path': '$ecommerce'
+        }
+      }, {
+        '$lookup': {
+          'from': 'ECommerce', 
+          'localField': 'ecommerce.ecommerceID', 
+          'foreignField': '_id', 
+          'as': 'ecommerce.info'
+        }
+      }, {
+        '$set': {
+          'organization': {
+            '$arrayElemAt': [
+              '$organization', 0
+            ]
+          }, 
+          'ecommerce.info': {
+            '$arrayElemAt': [
+              '$ecommerce.info', 0
+            ]
+          }
+        }
+      }, {
+        '$group': {
+          '_id': '$_id', 
+          'title': {
+            '$first': '$title'
+          }, 
+          'images': {
+            '$first': '$images'
+          }, 
+          'attributes': {
+            '$first': '$attributes'
+          }, 
+          'identifiers': {
+            '$first': '$identifiers'
+          }, 
+          'satisfactory_rating': {
+            '$first': '$satisfactory_rating'
+          }, 
+          'organization': {
+            '$first': '$organization'
+          }, 
+          'reviews': {
+            '$first': '$reviews'
+          }, 
+          'ecommerce': {
+            '$push': {
+              '_id': '$ecommerce.ecommerceID', 
+              'name': '$ecommerce.info.name', 
+              'init_price': '$ecommerce.init_price', 
+              'curr_price': '$ecommerce.curr_price', 
+              'product_url': '$ecommerce.product_url', 
+              'last_scrapped': '$ecommerce.last_scrapped'
+            }
+          }
+        }
+      }, {
+        '$project': {
+          'organization.products': 0, 
+          'reviews.product': 0, 
+          'reviews.user.email': 0, 
+          'reviews.user.hashedpassword': 0, 
+          'reviews.user.reviews': 0, 
+          'reviews.user.bookmarks': 0, 
+          'reviews.user.created_on': 0, 
+          'reviews.ecommerce.product_url': 0, 
+          'reviews.ecommerce.search_url': 0, 
+          'reviews.ecommerce.products_scrapped': 0, 
+          'reviews.ecommerce.past_scrapes': 0
+        }
+      }
+    ])
+    // .populate({
+    //     path: 'organization',
+    //     select: 'name'
+    //   })
+    //   .populate({
+    //     path: 'ecommerce.ecommerceID',
+    //     model: ECommerce,
+    //     select: 'name'
+    //   })
+    //   .populate({
+    //     path: 'reviews',
+    //     populate: {
+    //       path: 'user ecommerce',
+    //       select: 'name'
+    //     }
+    //   })
+    res.status(200).json({ productData: productData[0] })
   } catch (e) {
     console.error(e)
     res.status(500).json({ message: 'Internal Server Error', error: e })
@@ -448,6 +640,27 @@ router.post('/search', async (req, res) => {
                 '$addFields': {
                   'min_price': {
                     '$min': '$ecommerce.curr_price'
+                  },
+                  'satisfactory_rating': {
+                    '$cond': [
+                      {
+                        '$eq': [
+                          '$review_count', 0
+                        ]
+                      }, "--", {
+                        '$multiply': [
+                          {
+                            '$divide': [
+                              '$rating_sum', {
+                                '$multiply': [
+                                  '$review_count', 5
+                                ]
+                              }
+                            ]
+                          }, 100
+                        ]
+                      }
+                    ]
                   }
                 }
               }, {

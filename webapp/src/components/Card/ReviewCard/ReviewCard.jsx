@@ -18,6 +18,7 @@ import {
 import { SiFlipkart } from "react-icons/si";
 import { GoVerified } from "react-icons/go";
 import { FiExternalLink } from "react-icons/fi";
+import { ApiBaseUrl } from "../../../config";
 
 const ReviewCard = (props) => {
 	// console.log(props.stars);
@@ -29,7 +30,8 @@ const ReviewCard = (props) => {
 					borderRadius='full'
 					boxSize='50px'
 					src='https://bit.ly/dan-abramov'
-					alt='Dan Abramov'
+					// src={ApiBaseUrl+ "/static/" + props.user.profilepic}
+					alt={props.user.name}
 				/>
 				<VStack>
 					<HStack>
