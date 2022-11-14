@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     }
     //Me bad
     //Dont Say
-          // '_id': mongoose.Types.ObjectId(prodID)
+    // '_id': mongoose.Types.ObjectId(prodID)
     const productData = await Product.aggregate([
       {
         '$match': {
@@ -216,7 +216,7 @@ router.get('/', async (req, res) => {
         '$addFields': {
           'reviews': {
             '$filter': {
-              'input': '$reviews', 
+              'input': '$reviews',
               'cond': {
                 '$ifNull': [
                   '$$this._id', undefined
@@ -617,8 +617,33 @@ router.post('/search', async (req, res) => {
                 '$addFields': {
                   'review_count': {
                     '$size': '$reviews'
+                  },
+                  'satisfactory_rating': {
+                    '$cond': [
+                      {
+                        '$eq': [
+                          {
+                            '$size': '$reviews'
+                          }, 0
+                        ]
+                      }, 0, {
+                        '$multiply': [
+                          {
+                            '$divide': [
+                              '$rating_sum', {
+                                '$multiply': [
+                                  {
+                                    '$size': '$reviews'
+                                  }, 5
+                                ]
+                              }
+                            ]
+                          }, 100
+                        ]
+                      }
+                    ]
                   }
-                }
+                },
               }, {
                 '$sort': {
                   [sort]: sort_form
@@ -646,27 +671,6 @@ router.post('/search', async (req, res) => {
                 '$addFields': {
                   'min_price': {
                     '$min': '$ecommerce.curr_price'
-                  },
-                  'satisfactory_rating': {
-                    '$cond': [
-                      {
-                        '$eq': [
-                          '$review_count', 0
-                        ]
-                      }, "--", {
-                        '$multiply': [
-                          {
-                            '$divide': [
-                              '$rating_sum', {
-                                '$multiply': [
-                                  '$review_count', 5
-                                ]
-                              }
-                            ]
-                          }, 100
-                        ]
-                      }
-                    ]
                   }
                 }
               }, {
