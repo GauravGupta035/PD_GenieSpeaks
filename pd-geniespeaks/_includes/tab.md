@@ -1,4 +1,4 @@
-### GenieSpeaks
+## GenieSpeaks
 
 {% tabs users %}
 
