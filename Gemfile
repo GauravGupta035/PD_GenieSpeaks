@@ -10,8 +10,8 @@ gem 'jekyll-figure'
 gem 'jekyll-gist'
 gem 'jekyll-feed'
 gem 'jemoji'
-gem "jekyll-tabs"
 gem 'jekyll-include-cache'
+gem "jekyll-tabs"
 
 # group :jekyll_plugins do
 #     # ... other gems
