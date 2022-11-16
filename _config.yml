@@ -1,2 +1,8 @@
 plugins:
   - jekyll-tabs
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jekyll-feed
+  - jemoji
+  - jekyll-include-cache
