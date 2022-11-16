@@ -4,7 +4,11 @@
 <loc>/</loc>
 </url>
 <url>
-<loc>/docs/</loc>
+<loc>/docs/docs/</loc>
 <lastmod>2022-11-16T10:04:14+05:30</lastmod>
+</url>
+<url>
+<loc>/docs/</loc>
+<lastmod>2022-11-16T10:08:49+05:30</lastmod>
 </url>
 </urlset>
