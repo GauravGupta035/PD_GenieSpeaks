@@ -1,3 +1,6 @@
+website: https://gauravgupta035.github.io
+basewebsite: /PD_GenieSpeaks
+
 plugins:
   - jekyll-tabs
   - jekyll-paginate
