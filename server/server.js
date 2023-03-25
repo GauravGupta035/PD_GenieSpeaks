@@ -2,6 +2,8 @@ const express = require('express')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
+const passport = require('passport')
+const cookieSession = require("cookie-session")
 
 require('./db_init.js')
 require('dotenv').config()
@@ -15,6 +17,16 @@ app.use(cors({
   origin: true,
   credentials: true
 }))
+
+app.use(
+	cookieSession({
+		name: "session",
+		keys: ["cyberwolve"],
+		maxAge: 24 * 60 * 60 * 100,
+	})
+);
+app.use(passport.initialize())
+app.use(passport.session())
 
 // logging middleware
 const requestLogger = (req, res, next) => {

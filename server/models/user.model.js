@@ -13,9 +13,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  googleid: {
+    type: String,
+  },
   hashedpassword: {
     type: String,
-    required: true,
     select: false
   },
   reviews: {

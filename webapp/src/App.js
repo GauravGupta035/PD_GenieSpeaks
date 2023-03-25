@@ -9,10 +9,12 @@ import ProductDetail from "./components/ProductDetail/ProductDetail";
 
 import { SearchContextProvider } from "./context/SearchContext/SearchContext";
 import ProductReview from "./components/ProductReview/ProductReview";
+import { UserContextProvider } from "./context/UserContext/UserContext";
 
 const App = () => {
 	return (
 		<div className='App'>
+			<UserContextProvider>
 			<SearchContextProvider>
 				<BrowserRouter>
 					<Routes>
@@ -25,6 +27,7 @@ const App = () => {
 					</Routes>
 				</BrowserRouter>
 			</SearchContextProvider>
+			</UserContextProvider>
 		</div>
 	);
 };

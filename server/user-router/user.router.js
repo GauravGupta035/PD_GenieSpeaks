@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const passport = require("passport");
 
 const Product = require("../models/product.model.js");
 const Review = require("../models/review.model.js");
@@ -123,6 +124,15 @@ router.post("/login", async (req, res) => {
 		});
 	}
 });
+
+router.get(
+	"/google/callback",
+	passport.authenticate("google", {
+		successRedirect: "/",
+		// failureRedirect: "/login/",
+		failureMessage: "Login failed!",
+	})
+);
 
 router.get("/logout", (req, res) => {
 	res

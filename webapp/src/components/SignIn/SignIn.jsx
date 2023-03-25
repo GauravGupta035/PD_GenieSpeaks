@@ -21,6 +21,13 @@ const SignIn = () => {
 	const { colorMode, toggleColorMode } = useColorMode();
 	const isDark = colorMode === "dark";
 
+	const googleAuth = () => {
+		window.open(
+			`http://localhost:5000/auth/google/callback`,
+			"_self"
+		);
+	};
+
 	const SignInContainer = () => {
 		return (
 			<Flex ml={20} p={5} bg='transparent' h='85vh'>
@@ -91,6 +98,7 @@ const SignIn = () => {
 							bgColor='white'
 							mb={5}
 							_hover={{ borderColor: "blue" }}
+							onClick={googleAuth}
 						>
 							<Text color='black' mr={2}>
 								Sign In with{" "}
