@@ -1,4 +1,4 @@
-# Developer
+# GenieSpeaks: A One-stop shop for reviews from all over the world
 
 ## Problem Statement / EPIC
 
